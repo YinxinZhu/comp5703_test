@@ -1,6 +1,6 @@
 # CS26 2D Structure Design MVP (Code Foundation)
 
-本仓库基于《二维结构设计与成本估算系统毕业设计版技术实现文档》持续开发，当前已实现“项目创建 → 设计版本保存 → 估价 → 估价记录查询”的可测试后端核心流程（内存存储版）。
+本仓库基于《二维结构设计与成本估算系统毕业设计版技术实现文档》持续开发，当前已实现“项目创建 → 设计版本保存 → 估价 → 估价记录查询 → HTML 报告生成/查询”的可测试后端核心流程（内存存储版）。
 
 ## 当前能力
 
@@ -13,8 +13,9 @@
   - 保存版本（自动计算工程量）
   - 基于项目版本执行估价
   - 查询项目估价历史
-- 基础权限控制：仅项目 owner 可保存版本/执行估价。
+- 基础权限控制：仅项目 owner 可保存版本/执行估价/生成报告。
 - 估价快照持久化（价格与厚度参数）用于追溯。
+- 报告能力：根据估价记录生成 HTML 报告并可按 reportId 查询。
 - 单元测试与流程测试（Vitest）。
 
 ## 项目结构
@@ -24,11 +25,14 @@ src/
   api/
     estimate-route.ts        # 独立估价请求示例
     project-routes.ts        # 项目流程 API（含显式payload校验与错误映射）
+    report-routes.ts         # 报告生成与查询 API
   application/
     estimate-engine.ts       # 估价业务逻辑
     project-service.ts       # 项目流程应用服务
+    report-service.ts        # 报告业务逻辑
   domain/
     estimate.ts              # 估价记录模型
+    report.ts                # 报告记录模型
     geometry.ts              # 几何计算与解析
     project.ts               # 项目与版本领域模型
     types.ts                 # 估价领域类型定义
@@ -42,6 +46,8 @@ tests/
   estimate-route.test.ts
   project-service.test.ts
   project-routes.test.ts
+  report-service.test.ts
+  report-routes.test.ts
 ```
 
 ## 本地运行

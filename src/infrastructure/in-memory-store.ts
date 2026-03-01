@@ -1,5 +1,6 @@
 import type { EstimateRecord } from '../domain/estimate.js'
 import type { Project, ProjectVersion } from '../domain/project.js'
+import type { EstimateReport } from '../domain/report.js'
 
 export interface StoreTables {
   projects: Map<string, Project>
@@ -7,6 +8,8 @@ export interface StoreTables {
   versionsByProject: Map<string, ProjectVersion[]>
   estimates: Map<string, EstimateRecord>
   estimatesByProject: Map<string, EstimateRecord[]>
+  reports: Map<string, EstimateReport>
+  reportsByEstimateRecord: Map<string, EstimateReport[]>
 }
 
 export interface ProjectRepository {
@@ -23,6 +26,13 @@ export interface VersionRepository {
 export interface EstimateRepository {
   save(record: EstimateRecord): void
   findByProjectId(projectId: string): EstimateRecord[]
+  findById(estimateRecordId: string): EstimateRecord | undefined
+}
+
+export interface ReportRepository {
+  save(report: EstimateReport): void
+  findByEstimateRecordId(estimateRecordId: string): EstimateReport[]
+  findById(reportId: string): EstimateReport | undefined
 }
 
 export function createStore(): StoreTables {
@@ -31,7 +41,9 @@ export function createStore(): StoreTables {
     versions: new Map(),
     versionsByProject: new Map(),
     estimates: new Map(),
-    estimatesByProject: new Map()
+    estimatesByProject: new Map(),
+    reports: new Map(),
+    reportsByEstimateRecord: new Map()
   }
 }
 
@@ -71,6 +83,25 @@ function createEstimateRepository(store: StoreTables): EstimateRepository {
     },
     findByProjectId(projectId) {
       return store.estimatesByProject.get(projectId) ?? []
+    },
+    findById(estimateRecordId) {
+      return store.estimates.get(estimateRecordId)
+    }
+  }
+}
+
+function createReportRepository(store: StoreTables): ReportRepository {
+  return {
+    save(report) {
+      store.reports.set(report.id, report)
+      const list = store.reportsByEstimateRecord.get(report.estimateRecordId) ?? []
+      store.reportsByEstimateRecord.set(report.estimateRecordId, [...list, report])
+    },
+    findByEstimateRecordId(estimateRecordId) {
+      return store.reportsByEstimateRecord.get(estimateRecordId) ?? []
+    },
+    findById(reportId) {
+      return store.reports.get(reportId)
     }
   }
 }
@@ -79,7 +110,8 @@ export const defaultStore = createStore()
 export const repositories = {
   projects: createProjectRepository(defaultStore),
   versions: createVersionRepository(defaultStore),
-  estimates: createEstimateRepository(defaultStore)
+  estimates: createEstimateRepository(defaultStore),
+  reports: createReportRepository(defaultStore)
 }
 
 export function resetStore(): void {
@@ -88,4 +120,6 @@ export function resetStore(): void {
   defaultStore.versionsByProject.clear()
   defaultStore.estimates.clear()
   defaultStore.estimatesByProject.clear()
+  defaultStore.reports.clear()
+  defaultStore.reportsByEstimateRecord.clear()
 }
