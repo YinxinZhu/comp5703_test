@@ -87,14 +87,25 @@ export function createEstimateReport(input: {
   return report
 }
 
-export function getEstimateReport(reportId: string): EstimateReport {
-  if (!reportId.trim()) {
+export function getEstimateReport(input: { actorId: string; reportId: string }): EstimateReport {
+  if (!input.actorId.trim()) {
+    throw new ValidationError('actorId is required')
+  }
+  if (!input.reportId.trim()) {
     throw new ValidationError('reportId is required')
   }
 
-  const report = repositories.reports.findById(reportId)
+  const report = repositories.reports.findById(input.reportId)
   if (!report) {
-    throw new NotFoundError(`Report ${reportId} not found`)
+    throw new NotFoundError(`Report ${input.reportId} not found`)
+  }
+
+  const project = repositories.projects.findById(report.projectId)
+  if (!project) {
+    throw new NotFoundError(`Project ${report.projectId} not found`)
+  }
+  if (project.ownerId !== input.actorId) {
+    throw new ForbiddenError('Only owner can read report')
   }
 
   return report

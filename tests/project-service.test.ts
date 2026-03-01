@@ -55,6 +55,7 @@ describe('project service', () => {
       }
     })
 
+    expect(result.project.status).toBe('estimated')
     expect(result.estimateRecord.result.currency).toBe('AUD')
     expect(result.estimateRecord.result.total).toBe(854.4)
     expect(result.estimateRecord.pricingSnapshot).toMatchObject({
@@ -66,8 +67,6 @@ describe('project service', () => {
     const records = listProjectEstimates(project.id)
     expect(records).toHaveLength(1)
   })
-
-
 
   it('throws NotFoundError when listing estimates of unknown project', () => {
     expect(() => listProjectEstimates('prj_missing')).toThrow(NotFoundError)

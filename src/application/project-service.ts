@@ -158,14 +158,15 @@ export function estimateProjectVersion(input: {
 
   repositories.estimates.save(estimateRecord)
 
-  repositories.projects.save({
+  const updatedProject: Project = {
     ...project,
     status: 'estimated',
     updatedAt: new Date().toISOString()
-  })
+  }
+  repositories.projects.save(updatedProject)
 
   return {
-    project,
+    project: updatedProject,
     version,
     estimateRecord
   }

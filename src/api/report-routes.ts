@@ -48,9 +48,9 @@ export async function postEstimateReport(body: unknown): Promise<HttpResponse<un
   }
 }
 
-export async function getReport(reportId: string): Promise<HttpResponse<unknown>> {
+export async function getReport(input: { actorId: string; reportId: string }): Promise<HttpResponse<unknown>> {
   try {
-    const report = getEstimateReport(reportId)
+    const report = getEstimateReport(input)
     return {
       status: 200,
       body: report
